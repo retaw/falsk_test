@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}index{% endblock %}
+
+{% block page_content %}
+<div>
+    <h4> {{ info }} </h4>
+</div>
+<table border="1">
+    <tr> <th>玩家id</th> <th>流水号</th> <th>金额</th> <th>对方id</th> <th>时间</th> </tr>
+    {% for item  in records %}
+  	<tr> <td>{{item[0]}}</td> <td>{{ item[1] }} </td> <td>{{ item[2] }}</td> <td>{{ item[3] }}</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}
+{% block scripts %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Admin-login{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>{{ tittle }}</h1>
+</div>
+<div>
+    <h3>{{ msg }}</h3>
+    <h3><a href="{{ next_url }}">继续</a></h3>
+</div>
+{% endblock %}
+{% block scripts %}
+{% endblock %}
+

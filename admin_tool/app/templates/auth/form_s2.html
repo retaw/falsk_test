@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+<link href="{{ url_for('static', filename='bootstrap-datepicker.standalone.min.css') }}" rel="stylesheet">
+
+{% block title %}Admin-login{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>登录</h1>
+</div>
+<div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+</div>
+<div id="sandbox-container" class="span5 col-md-5">
+    <input id="date2" name="date2" type="text" class="form-control"/>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='bootstrap-datepicker.min.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap-datepicker.zh-CN.min.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    var date_input=$('input[name="date2"]');
+    date_input.datepicker({}) })
+$(function(){
+    ('#date1').datepicker({
+        weekStart: 1,
+        autoclose: true,
+        daysOfWeekHighlighted: "0,6",
+        format: "yyyy/mm/dd",
+        language: "zh-CN"
+        )});
+</script>
+{% endblock %}
+

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}index{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>欢迎 {% if current_user.is_authenticated %}{{ current_user.phonenum }}{% else %}游客{% endif %}</h1>
+</div>
+{% if not current_user.is_authenticated %}
+<div>
+    <h1>请登录<a href="{{ url_for('auth.login') }}">登录</a></h1>
+</div>
+{% else %}
+<ul class="list-group">
+    <li class="list-group-item"> <a href="{{ url_for('main.admin_add_agency') }}">添加代理</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.admin_agency_recharge') }}">代理充值</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">玩家充值</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_detail') }}">代理充值记录</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.player_financial_detail') }}">玩家充值记录</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.admin_test') }}">GM工具</a></li>
+</ul>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+{% endblock %}
