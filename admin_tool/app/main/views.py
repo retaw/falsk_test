@@ -114,10 +114,10 @@ def player_recharge():
         playerid = form.playerid.data
         money    = form.money.data
 
+        agencyid = current_user.agencyid
         if current_user.is_admin():
-            dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAdmin(playerid, money)
+            dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAdmin(agencyid, playerid, money)
         else:
-            agencyid = current_user.agencyid
             dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAgency(agencyid, playerid, money)
 
         if dbRetIsOk == True:
