@@ -34,5 +34,5 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 
 if __name__ == '__main__':
     manager.run()
-    #server = pywsgi.WSGIServer(('0.0.0.0', 5000), app)
+    #server = pywsgi.WSGIServer(('0.0.0.0', 8000), app)
     #server.serve_forever()

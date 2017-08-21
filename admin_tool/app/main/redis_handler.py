@@ -21,7 +21,7 @@ class Redishandler(object):
         return self.__conn
 
     def playerExisit(self, playerid):
-        return True #fortest
+#        return True #fortest
         return self.__conn.hexists(Redishandler.TB_CLIENT_CUID_2_OPENID, str(playerid))
 
     def playerRecharge(self, sn, playerid, money, operator):
