@@ -279,7 +279,7 @@ class Mysqlhandler:
             #add recharge record to redis
             if not Redishandler.me().playerExisit(playerid):
                 return False, u"充值失败, 玩家id不存在"
-            if Redishandler.me().playerRecharge(sn, playerid, money, agencyid) is not True:
+            if Redishandler.me().playerRecharge(sn, playerid, money, adminid) is not True:
                 self.rollback(cursor)
                 return False, u"充值失败, 0x12"
             
