@@ -53,9 +53,9 @@ def admin_add_agency():
         if agencyid == superviorid:
             flash(u"代理的上级不能是自己")
         else:
-            dbRet = Mysqlhandler.me().addAgency(agencyid, password, None if current_user.is_admin() else superviorid)
+            dbRet = Mysqlhandler.me().addAgency(agencyid, password, superviorid, current_user.agencyid == superviorid)
             if dbRet is None:
-                form.agencyid.data = ""
+                form.agencyid.data = None
                 form.superviorid.data = current_user.agencyid
                 msg = u'代理设置成功, ID:{}, 上级ID:{}'.format(agencyid, superviorid)
                 return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
