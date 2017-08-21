@@ -45,6 +45,7 @@ def admin_test():
 @admin_required
 def admin_add_agency():
     form = AddAgencyForm()
+    form.superviorid.data = current_user.agencyid
     if form.validate_on_submit():
         agencyid = form.agencyid.data
         superviorid = form.superviorid.data
@@ -54,8 +55,8 @@ def admin_add_agency():
         else:
             dbRet = Mysqlhandler.me().addAgency(agencyid, password, None if current_user.is_admin() else superviorid)
             if dbRet is None:
-                form.agencyid.data = ""
-                form.superviorid.data = ""
+                form.agencyid.data = None
+                form.superviorid.data = current_user.agencyid
                 msg = u'代理设置成功, ID:{}, 上级ID:{}'.format(agencyid, superviorid)
                 return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
             flash(u"代理设置失败, {}".format(dbRet))
