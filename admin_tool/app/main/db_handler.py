@@ -187,6 +187,12 @@ class Mysqlhandler:
     def addPlayer(self, superviorid, playerid, isAdmin):
         cursor = self.getCursor()
         try:
+            if isAdmin is True and superviorid == 0:
+                sqlDeleteAgencyRelation = u"delete from players where playerid={}".format(playerid)
+                cursor.execute(sqlCheckAgencyid)
+                self.commit(cursor)
+                return True, u"已解除玩家{}的现有代理关系".format(playerid)
+
             sqlCheckAgencyid = u"select agencyid from agencies where agencyid={}".format(superviorid)
             if cursor.execute(sqlCheckAgencyid) == 0:
                 return False, u"代理 {} 不存在".format(superviorid)
