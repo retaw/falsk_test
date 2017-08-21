@@ -109,7 +109,7 @@ class Mysqlhandler:
             return u"ID={}的玩家不存在".format(agencyid)
         cursor = self.getCursor()
         try:
-            if superviorid != 0:
+            if superviorid is not None:
                 sqlCheckSuperviorid = u"select agencyid from agencies where agencyid={}".format(superviorid)
                 if cursor.execute(sqlCheckSuperviorid) < 1:
                     return u"上级代理不正确, ID={}的代理不存在".format(superviorid)
@@ -283,7 +283,7 @@ class Mysqlhandler:
                 self.rollback(cursor)
                 return False, u"充值失败, 0x12"
             
-            logger.info("player recharge by admin, sn={}, playerid={}, money={}, agencyid={}".format(sn, playerid, money, agencyid))
+            logger.info("player recharge by admin, sn={}, playerid={}, money={}, agencyid={}".format(sn, playerid, money, adminid))
             self.commit(cursor)
             return True, sn
 
