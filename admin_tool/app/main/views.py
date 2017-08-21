@@ -55,7 +55,7 @@ def admin_add_agency():
         else:
             dbRet = Mysqlhandler.me().addAgency(agencyid, password, None if current_user.is_admin() else superviorid)
             if dbRet is None:
-                form.agencyid.data = None
+                form.agencyid.data = ""
                 form.superviorid.data = current_user.agencyid
                 msg = u'代理设置成功, ID:{}, 上级ID:{}'.format(agencyid, superviorid)
                 return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
