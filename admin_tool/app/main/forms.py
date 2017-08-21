@@ -18,7 +18,7 @@ from wtforms.validators import Required, Length, NumberRange, EqualTo, InputRequ
 
 class AddAgencyForm(FlaskForm):
     agencyid      = IntegerField(u'代理ID(和游戏内的玩家ID相同)', validators=[Required()])
-    superviorid   = IntegerField(u'上级ID(无上级代理的这里填88888888)', validators=[InputRequired()])
+    superviorid   = IntegerField(u'上级ID(无上级代理的这里填88888888)', validators=[InputRequired()], default=88888888)
     password      = PasswordField(u'密码', validators=[Required(), EqualTo("passwordAgain", message=u"两次输入的密码必须一致")])
     passwordAgain = PasswordField(u'再输一遍密码', validators=[Required()])
     submit = SubmitField(u'确定')

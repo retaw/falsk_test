@@ -45,7 +45,6 @@ def admin_test():
 @admin_required
 def admin_add_agency():
     form = AddAgencyForm()
-    form.superviorid.data = current_user.agencyid
     if form.validate_on_submit():
         agencyid = form.agencyid.data
         superviorid = form.superviorid.data

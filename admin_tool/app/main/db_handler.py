@@ -106,7 +106,8 @@ class Mysqlhandler:
 
     def addAgency(self, agencyid, password, superviorid, isAdmin):
         if Redishandler.me().playerExisit(agencyid) is not True:
-            return u"ID={}的玩家不存在".format(agencyid)
+            pass
+            #return u"ID={}的玩家不存在".format(agencyid)
         cursor = self.getCursor()
         try:
             if isAdmin is not True:
