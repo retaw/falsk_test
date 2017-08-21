@@ -40,6 +40,14 @@ def index():
 def admin_test():
     return u'暂未开放'
 
+#所有变动性操作, 成功后跳转到这里来显示结果, 避免f5刷新造成的重复修改
+@main.route('/rander_form_ret')
+def rander_form_ret():
+    msg = request.args.get('msg')
+    op  = request.args.get('op')
+    return render_template('form_ret.html', msg = msg, next_url = url_for(op))
+
+
 @main.route('/admin_add_agency',  methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -57,7 +65,8 @@ def admin_add_agency():
                 form.agencyid.data = None
                 form.superviorid.data = current_user.agencyid
                 msg = u'代理设置成功, ID:{}, 上级ID:{}'.format(agencyid, superviorid)
-                return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
+                #return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
+                return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_add_agency'))
             flash(u"代理设置失败, {}".format(dbRet))
     return render_template('form.html', form=form, tittle=u"设置代理")
 
@@ -73,7 +82,8 @@ def admin_modify_agency():
         if dbRet is None:
             form.agencyid.data = ''
             msg = u"操作成功, {} 已经不是代理了".format(agencyid)
-            return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_modify_agency'))
+            #return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_modify_agency'))
+            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_modify_agency'))
         flash(u"操作失败, {}".format(dbRet))
     return render_template('form.html', form=form, tittle=u"删除代理")
 
@@ -95,7 +105,8 @@ def agency_recharge():
             form.agencyid.data = ""
             form.money.data = ""
             msg = u'代理充值成功, ID:{}, 充值额:{}, 流水号:{}'.format(agencyid, money, dbRetData)
-            return render_template('form_ret.html', msg = msg, next_url = url_for('main.agency_recharge')) 
+            #return render_template('form_ret.html', msg = msg, next_url = url_for('main.agency_recharge')) 
+            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.agency_recharge'))
         
         flash(u"充值失败, {}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"给代理金库充值")
@@ -117,7 +128,8 @@ def add_player():
             form.playerid.data    = ""
             form.superviorid.data = ""
             msg = u'玩家代理关系设置成功, 玩家ID:{}, 代理ID:{}'.format(playerid, superviorid)
-            return render_template('form_ret.html', msg = msg, next_url = url_for('main.add_player')) 
+            #return render_template('form_ret.html', msg = msg, next_url = url_for('main.add_player')) 
+            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.add_player'))
         else:
             flash(u"绑定失败, {}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"设置玩家的代理")
@@ -141,7 +153,8 @@ def player_recharge():
             form.playerid.data = ""
             form.money.data = ""
             msg = u'充值成功, 玩家id:{}, 充值额:{}, 流水号:{}'.format(playerid, money, dbRetData)
-            return render_template('form_ret.html', msg = msg, next_url = url_for('main.player_recharge')) 
+            #return render_template('form_ret.html', msg = msg, next_url = url_for('main.player_recharge')) 
+            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.player_recharge'))
         else:
             flash(u"充值失败, {}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"给玩家游戏账号充值")
