@@ -7,42 +7,47 @@ import json
 
 
 class User(UserMixin):
-    admin_phonenum = "88888888"
+    admin_agencyid = 88888888
     admin_password = "123456"
 
 
     @staticmethod
-    def create(phonenum):
+    def create(agencyid):
+        print "agenceid = ", agencyid
         password = "123456"
-        if phonenum != User.admin_phonenum:
-            password = Mysqlhandler.me().getAgencyPassword(phonenum)
+        superviorid = None
+        if agencyid != User.admin_agencyid:
+            superviorid, password = Mysqlhandler.me().getAgencyBasicInfo(agencyid)
+        else:
+            print "admin login"
         if password is not None:
-            return User(phonenum, password)
+            return User(agencyid, superviorid, password)
         return None
 
-    def __init__(self, phonenum, password):
-        self.phonenum = phonenum
-        self.password = password
+    def __init__(self, agencyid, superviorid, password):
+        self.agencyid    = agencyid
+        self.superviorid = superviorid
+        self.password    = password
 
     def get_id(self):
-        return self.phonenum
+        return str(self.agencyid)
 
     def verify_password(self, password):
-        print "verify_passwd {} {}".format(self.phonenum, password)
+        print "verify_passwd {} {}".format(self.agencyid, password)
         return password == self.password
 
     def is_admin(self):
-        return self.phonenum == User.admin_phonenum
+        return self.agencyid == User.admin_agencyid
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.agencyid
 
 
 
 @login_manager.user_loader
-def load_user(phonenum):
-    print "load_user", phonenum
-    return User.create(phonenum)
+def load_user(agencyidStr):
+    print "load_user", agencyidStr
+    return User.create(int(agencyidStr))
 
 
 

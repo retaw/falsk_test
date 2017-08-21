@@ -4,7 +4,7 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>欢迎 {% if current_user.is_authenticated %}{{ current_user.phonenum }}{% else %}游客{% endif %}</h1>
+    <h1>斗阵十三水后台管理系统, 当前用户ID:  {% if current_user.is_authenticated %}{{ current_user.agencyid }}{% else %}无{% endif %}</h1>
 </div>
 {% if not current_user.is_authenticated %}
 <div>
@@ -12,11 +12,15 @@
 </div>
 {% else %}
 <ul class="list-group">
-    <li class="list-group-item"> <a href="{{ url_for('main.admin_add_agency') }}">添加代理</a></li>
-    <li class="list-group-item"> <a href="{{ url_for('main.admin_agency_recharge') }}">代理充值</a></li>
-    <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">玩家充值</a></li>
-    <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_detail') }}">代理充值记录</a></li>
-    <li class="list-group-item"> <a href="{{ url_for('main.player_financial_detail') }}">玩家充值记录</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.admin_add_agency') }}">设置代理</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.agency_recharge') }}">给代理金库充值</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.add_player') }}">设置玩家</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">给玩家游戏账号充值</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_info') }}">下属钻石情况查询</a></li>
+    <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_detail') }}">代理钻石详情记录</a></li>
+    <!--
+        <li class="list-group-item"> <a href="{{ url_for('main.player_financial_detail') }}">玩家充值记录</a></li>
+    -->
     <li class="list-group-item"> <a href="{{ url_for('main.admin_test') }}">GM工具</a></li>
 </ul>
 {% endif %}

@@ -15,6 +15,7 @@ from . import main
 from functools import wraps
 from db_handler import Mysqlhandler
 from .forms import *
+import wtforms_components
 
 def admin_required(func):
     @wraps(func)
@@ -44,37 +45,65 @@ def admin_test():
 def admin_add_agency():
     form = AddAgencyForm()
     if form.validate_on_submit():
-        phonenum = form.phonenum.data
-        nickname = form.nickname.data
+        agencyid = form.agencyid.data
+        superviorid = form.superviorid.data
         password = form.password.data
-        dbRet = Mysqlhandler.me().addAgency(phonenum, nickname, password)
-        if dbRet is None:
-            form.phonenum.data = ""
-            form.nickname.data = ""
-            msg = u'添加成功, 手机:{}, 名字:{}'.format(phonenum, nickname)
-            return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
+        if agencyid == superviorid:
+            flash(u"代理的上级不能是自己")
         else:
-            flash(u"添加失败, 数据库写入失败, {}".format(dbRet))
-    return render_template('form.html', form=form, tittle=u"添加代理")
+            dbRet = Mysqlhandler.me().addAgency(agencyid, password, superviorid)
+            if dbRet is None:
+                form.agencyid.data = ""
+                form.superviorid.data = ""
+                msg = u'代理设置成功, ID:{}, 上级ID:{}'.format(agencyid, superviorid)
+                return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
+            flash(u"代理设置失败, {}".format(dbRet))
+    return render_template('form.html', form=form, tittle=u"设置代理")
 
 
-@main.route('/admin_agency_recharge', methods=['GET', 'POST']) 
+@main.route('/agency_recharge', methods=['GET', 'POST']) 
 @login_required
-@admin_required
-def admin_agency_recharge():
+def agency_recharge():
     form = AddAgencyMoneyForm()
     if form.validate_on_submit():
-        phonenum = form.phonenum.data
+        agencyid = form.agencyid.data
         money    = form.money.data
-        dbRetIsOk, dbRetData = Mysqlhandler.me().agencyRecharge(phonenum, money)
-        if dbRetIsOk == True:
-            form.phonenum.data = ""
-            form.money.data = ""
-            msg = u'代理充值成功, 手机:{}, 充值金额:{}, 流水号:{}'.format(phonenum, money, dbRetData)
-            return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_agency_recharge')) 
+        superviorid = current_user.agencyid
+
+        if current_user.is_admin():
+            dbRetIsOk, dbRetData = Mysqlhandler.me().agencyRechargeByAdmin(superviorid, agencyid, money)
         else:
-            flash(u"充值失败, {}".format(dbRetData))
-    return render_template('form.html', form=form, tittle=u"代理充值")
+            dbRetIsOk, dbRetData = Mysqlhandler.me().agencyRechargeBySupervior(superviorid, agencyid, money)
+        if dbRetIsOk == True:
+            form.agencyid.data = ""
+            form.money.data = ""
+            msg = u'代理充值成功, ID:{}, 充值额:{}, 流水号:{}'.format(agencyid, money, dbRetData)
+            return render_template('form_ret.html', msg = msg, next_url = url_for('main.agency_recharge')) 
+        
+        flash(u"充值失败, {}".format(dbRetData))
+    return render_template('form.html', form=form, tittle=u"给代理金库充值")
+
+
+@main.route('/add_player', methods=['GET', 'POST']) 
+@login_required
+def add_player():
+    form = AddPlayerForm()
+    if not current_user.is_admin():
+        form.superviorid.data = current_user.agencyid
+        wtforms_components.read_only(form.superviorid)
+    if form.validate_on_submit():
+        playerid    = form.playerid.data
+        superviorid = form.superviorid.data if current_user.is_admin() else current_user.agencyid #反外挂
+        dbRetIsOk, dbRetData = Mysqlhandler.me().addPlayer(superviorid, playerid, current_user.is_admin())
+
+        if dbRetIsOk == True:
+            form.playerid.data    = ""
+            form.superviorid.data = ""
+            msg = u'玩家代理关系设置成功, 玩家ID:{}, 代理ID:{}'.format(playerid, superviorid)
+            return render_template('form_ret.html', msg = msg, next_url = url_for('main.add_player')) 
+        else:
+            flash(u"绑定失败, {}".format(dbRetData))
+    return render_template('form.html', form=form, tittle=u"设置玩家的代理")
 
 
 @main.route('/player_recharge', methods=['GET', 'POST']) 
@@ -88,61 +117,77 @@ def player_recharge():
         if current_user.is_admin():
             dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAdmin(playerid, money)
         else:
-            phonenum = current_user.phonenum
-            dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAgency(phonenum, playerid, money)
+            agencyid = current_user.agencyid
+            dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAgency(agencyid, playerid, money)
 
         if dbRetIsOk == True:
             form.playerid.data = ""
             form.money.data = ""
-            msg = u'充值成功, 玩家id:{}, 充值金额:{}, 流水号:{}'.format(playerid, money, dbRetData)
+            msg = u'充值成功, 玩家id:{}, 充值额:{}, 流水号:{}'.format(playerid, money, dbRetData)
             return render_template('form_ret.html', msg = msg, next_url = url_for('main.player_recharge')) 
         else:
             flash(u"充值失败, {}".format(dbRetData))
-    return render_template('form.html', form=form, tittle=u"玩家充值")
+    return render_template('form.html', form=form, tittle=u"给玩家游戏账号充值")
 
 
 
 @main.route('/agency_financial_detail', methods=['GET', 'POST'])
 @login_required
 def agency_financial_detail():
-    if current_user.is_admin():
-        form = QueryAgencyFinancialByAdminForm()
-        if form.validate_on_submit():
-            phonenum = form.phonenum.data
-            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyFinancialDetail(phonenum)
-            if dbRetIsOk == True:
-                info = "代理资金明细查询, 代理手机号: {}".format(phonenum)
-                return render_template('financial_detail.html', info = info, records = dbRetData, next_url = url_for('main.agency_financial_detail'))
-            else:
-                flash(u"查询失败{}".format(dbRetData))
-        return render_template('form.html', form=form, tittle=u"代理账目明细查询")
-    else:
-        form = QueryAgencyFinancialBySelfForm()
-        if form.validate_on_submit():
-            phonenum = current_user.phonenum
-            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyFinancialDetail(phonenum)
-            if dbRetIsOk == True:
-                info = "代理资金明细查询, 代理手机号: {}".format(phonenum)
-                return render_template('financial_detail.html', info = info, records = dbRetData, next_url = url_for('main.agency_financial_detail'))
-            else:
-                flash(u"查询失败{}".format(dbRetData))
-        return render_template('form.html', form=form, tittle=u"个人账目明细查询")
-            
+    form = QueryAgencyFinancialForm()
+    wtforms_components.read_only(form.submit2) #TODO, 暂时禁用, 待实现db中的指出查询后去掉这一行
+    if not current_user.is_admin():
+        form.agencyid.data = current_user.agencyid
+        wtforms_components.read_only(form.agencyid)
+
+    if form.validate_on_submit():
+        agencyid = form.agencyid.data if current_user.is_admin() else current_user.agencyid #反外挂
+        if form.submit1.data is True:
+            info = u"钻石购买明细, 代理ID: {}".format(agencyid)
+            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyIncomeDetail(agencyid)
+        else:
+            info = u"钻石支出明细, 代理ID: {}".format(agencyid)
+            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyOutcomeDetail(agencyid)
+        if dbRetIsOk == True:
+            return render_template('financial_detail.html', info = info, records = dbRetData, next_url = url_for('main.agency_financial_detail'))
+        flash(u"查询失败{}".format(dbRetData))
+    return render_template('form.html', form=form, tittle=u"钻石明细查询")
+
+
+@main.route('/agency_financial_info',  methods=['GET', 'POST'])
+@login_required
+def agency_financial_info():
+    superviorid = None if current_user.is_admin() else current_user.agencyid
+    form = QueryAgencyFinancialInfo()
+    if form.validate_on_submit():
+        if form.submit1.data is True:
+            msg= u"下属累计购买钻石数量"
+            dbRetIsOk, dbRetData = Mysqlhandler.me().queryAgencyIncomeInfo(superviorid)
+        else:
+            msg= u"下属累计支出钻石总量"
+            dbRetIsOk, dbRetData = Mysqlhandler.me().queryAgencyOutcomeInfo(superviorid)
+        if dbRetIsOk == True:
+            return render_template('financial_info.html', msg = msg, records = dbRetData, next_url = url_for('main.agency_financial_info'))
+        flash(u"查询失败, {}".format(dbRetData))
+    return render_template('form.html', form=form, tittle=u"下属钻石情况查询")
+
 
 
 @main.route('/player_financial_detail', methods=['GET', 'POST'])
 @login_required
 def player_financial_detail():
+    pass
+'''
     if current_user.is_admin():
         form = QueryPlayerFinancialByAdminForm()
         if form.validate_on_submit():
-            phonenum = form.phonenum.data
-            if phonenum is None or phonenum == "":
-                phonenum = "*"
+            agencyid = form.agencyid.data
+            if agencyid is None or agencyid == "":
+                agencyid = "*"
             playerid = form.playerid.data
-            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryPlayerRechargeDetail(playerid, phonenum)
+            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryPlayerRechargeDetail(playerid, agencyid)
             if dbRetIsOk == True:
-                info = u"玩家充值明细查询, 代理手机号: {}  玩家id: {}".format(phonenum, playerid)
+                info = u"玩家充值明细查询, agencyid: {}  玩家id: {}".format(agencyid, playerid)
                 return render_template('financial_detail.html', info = info, records = dbRetData, next_url = url_for('main.agency_financial_detail'))
             else:
                 flash(u"查询失败{}".format(dbRetData))
@@ -150,16 +195,15 @@ def player_financial_detail():
     else:
         form = QueryPlayerFinancialByAgencyForm()
         if form.validate_on_submit():
-            phonenum = current_user.phonenum
+            agencyid = current_user.agencyid
             playerid = form.playerid.data
-            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryPlayerRechargeDetail(playerid, phonenum)
+            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryPlayerRechargeDetail(playerid, agencyid)
             if dbRetIsOk == True:
-                info = u"玩家充值明细查询, 代理手机号: {}  玩家id: {}".format(phonenum, playerid)
+                info = u"玩家充值明细查询, agencyid: {}  玩家id: {}".format(agencyid, playerid)
                 return render_template('financial_detail.html', info = info, records = dbRetData, next_url = url_for('main.agency_financial_detail'))
             else:
                 flash(u"查询失败{}".format(dbRetData))
         return render_template('form.html', form=form, tittle=u"玩家账目明细查询")
-
-
+'''
 
 

@@ -11,46 +11,59 @@
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, DateTimeField, IntegerField
 from flask_admin.form.widgets import DatePickerWidget
-from wtforms.validators import Required, Length, NumberRange, EqualTo
+from wtforms.validators import Required, Length, NumberRange, EqualTo, InputRequired
+#from wtforms_components import TimeField
 
 
 
 class AddAgencyForm(FlaskForm):
-    phonenum = StringField(u'手机', validators=[Required()])
-    nickname = StringField(u'名字', validators=[Required()])
-    password = PasswordField(u'密码', validators=[Required(), EqualTo("passwordAgain", message=u"两次输入的密码必须一致")])
+    agencyid      = IntegerField(u'代理ID', validators=[Required()])
+    superviorid   = IntegerField(u'上级ID(无上级代理的这里填0)', validators=[InputRequired()])
+    password      = PasswordField(u'密码', validators=[Required(), EqualTo("passwordAgain", message=u"两次输入的密码必须一致")])
     passwordAgain = PasswordField(u'再输一遍密码', validators=[Required()])
     submit = SubmitField(u'确定')
 
 
 class AddAgencyMoneyForm(FlaskForm):
-    phonenum    = StringField(u"代理手机号", validators=[Required()])
-    money       = IntegerField(u"金额",      validators=[Required(), NumberRange(min = 1)])
+    agencyid    = IntegerField(u"代理ID", validators=[Required()])
+    money       = IntegerField(u"钻石",   validators=[Required(), NumberRange(min = 1)])
     submit = SubmitField(u'确定')
     
 
-class AddPlayerMoneyForm(FlaskForm):
-    playerid    = StringField(u"玩家ID", validators=[Required()])
-    money       = IntegerField(u"金额",      validators=[Required(), NumberRange(min = 1)])
+class AddPlayerForm(FlaskForm):
+    playerid    = IntegerField(u'玩家ID', validators=[Required()])
+    superviorid = IntegerField(u'代理ID', validators=[Required()])
     submit = SubmitField(u'确定')
 
 
-class QueryAgencyFinancialBySelfForm(FlaskForm):
-    submit = SubmitField(u"确定")
+class AddPlayerMoneyForm(FlaskForm):
+    playerid    = IntegerField(u"玩家ID", validators=[Required()])
+    money       = IntegerField(u"钻石",      validators=[Required(), NumberRange(min = 1)])
+    submit = SubmitField(u'确定')
+
+
+class QueryAgencyFinancialForm(FlaskForm):
+    agencyid    = IntegerField(u"代理ID", validators=[Required()])
+    submit1 = SubmitField(u"购买钻石明细")
+    submit2 = SubmitField(u"支付钻石明细")
     pass
 
-class QueryAgencyFinancialByAdminForm(FlaskForm):
-    phonenum    = StringField(u"代理手机号", validators=[Required()])
-    submit = SubmitField(u"确定")
-    pass
 
+class QueryAgencyFinancialInfo(FlaskForm):
+    submit1 = SubmitField(u"下属购买钻石查询")
+    submit2 = SubmitField(u"下属支出钻石查询")
+
+
+'''
 class QueryPlayerFinancialByAdminForm(FlaskForm):
-    playerid    = StringField(u"玩家ID", validators=[Required()])
-    phonenum    = StringField(u"代理手机号", validators=[])
+    playerid    = IntegerField(u"玩家ID", validators=[Required()])
+    agencyid    = IntegerField(u"代理ID", validators=[])
     submit = SubmitField(u"确定")
     pass
+
 
 class QueryPlayerFinancialByAgencyForm(FlaskForm):
-    playerid    = StringField(u"玩家ID", validators=[Required()])
+    playerid    = IntegerField(u"玩家ID", validators=[Required()])
     submit = SubmitField(u"确定")
     pass
+'''

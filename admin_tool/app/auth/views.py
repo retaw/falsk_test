@@ -19,10 +19,11 @@ from .forms import LoginForm
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        phonenum = form.username.data
-        user = User.create(phonenum)
+        agencyid = form.agencyid.data
+
+        user = User.create(agencyid)
         if user is not None and user.verify_password(form.password.data):
-            login_user(user, form.remember_me.data)
+            login_user(user, False)
             return redirect(request.args.get('next') or url_for('main.index'))
         flash(u'用户名或密码错误')
     return render_template('form.html', form=form, get_url=url_for, tittle=u"登录")

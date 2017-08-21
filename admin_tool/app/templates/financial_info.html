@@ -4,12 +4,12 @@
 
 {% block page_content %}
 <div>
-    <h4> {{ info }} </h4>
+    <h4> {{ msg }} </h4>
 </div>
 <table border="1">
-    <tr> <th>流水号</th> <th>金额</th> <th>上级代理ID</th> <th>时间</th> </tr>
+    <tr> <th>代理ID</th> <th>砖石数量</th> </tr>
     {% for item  in records %}
-  	<tr> <td>{{item[0]}}</td> <td>{{ item[1] }} </td> <td>{{ item[2] }}</td> <td>{{ item[3] }}</td> </tr>
+  	<tr> <td>{{item[0]}}</td> <td>{{ item[1] }} </td> </tr>
     {% endfor %}
 </table>
 {% endblock %}

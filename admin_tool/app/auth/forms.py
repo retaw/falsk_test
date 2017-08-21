@@ -8,14 +8,14 @@
 # Description: 
 #
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, DateTimeField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, DateTimeField, IntegerField
 from flask_admin.form.widgets import DatePickerWidget
-from wtforms.validators import Required, Length, Email
+from wtforms.validators import Required, Length, Email, InputRequired
 
 
 class LoginForm(FlaskForm):
-    username = StringField(u'手机', validators=[Required(), Length(1, 64)])
+    agencyid = IntegerField(u'手机', validators=[InputRequired()])
     password = PasswordField(u'密码', validators=[Required()])
     #date1     = DateTimeField(u'start', widget=DatePickerWidget())
-    remember_me = BooleanField(u'保持登入')
+    #remember_me = BooleanField(u'保持登入')
     submit = SubmitField(u'登录')
