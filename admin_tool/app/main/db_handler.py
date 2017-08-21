@@ -126,6 +126,17 @@ class Mysqlhandler:
             self.rollback(cursor)
             return e
 
+    def delAgency(self, agencyid):
+        cursor = self.getCursor()
+        try:
+            sql = u"delete from agencies where agencyid={}".format(agencyid)
+            cursor.execute(sql)
+            logger.info(u"delete agency, id={}".format(agencyid))
+            self.commit(cursor)
+        except MySQLdb.Error as e:
+            logger.error(e)
+            self.rollback(cursor)
+            return e
 
     def agencyRechargeByAdmin(self, adminid, agencyid, money):
         cursor = self.getCursor()
@@ -343,16 +354,17 @@ class Mysqlhandler:
     def queryAgencyOutcomeDetail(self, agencyid):
         cursor = self.getCursor();
         try:
-            sql = u"select agencyid, money, superviorid, timestamp from agency_money where agencyid={}".format(agencyid)
+            sql = u"select superviorid, money, agencyid, playerid, timestamp from agency_money where superviorid={}".format(agencyid)
             n = cursor.execute(sql)
 
             ret = []
             for row in cursor:
-                ret.append((row[0], row[1], row[2], row[3].strftime("%Y-%m-%d %H:%M:%S")))
+                ret.append((row[0], row[1], row[2], row[3], row[4].strftime("%Y-%m-%d %H:%M:%S")))
             return True, ret
         except MySQLdb.Error as e:
             logger.error(e)
             return False, e
+
 '''
     def queryPlayerRechargeDetail(self, playerid, agencyid):
         cursor = self.getCursor();

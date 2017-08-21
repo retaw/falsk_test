@@ -9,7 +9,7 @@
 </div>
 <div>
     <h3>{{ msg }}</h3>
-    <h3><a href="{{ next_url }}">继续</a></h3>
+    <h3>  <a href="{{ next_url }}"> 继续</a>  <a href="{{ url_for('main.index') }}"> 返回</a>  </h3>
 </div>
 {% endblock %}
 {% block scripts %}

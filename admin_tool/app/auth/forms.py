@@ -14,7 +14,7 @@ from wtforms.validators import Required, Length, Email, InputRequired
 
 
 class LoginForm(FlaskForm):
-    agencyid = IntegerField(u'手机', validators=[InputRequired()])
+    agencyid = IntegerField(u'账号(ID)', validators=[InputRequired()])
     password = PasswordField(u'密码', validators=[Required()])
     #date1     = DateTimeField(u'start', widget=DatePickerWidget())
     #remember_me = BooleanField(u'保持登入')

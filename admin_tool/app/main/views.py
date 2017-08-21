@@ -30,6 +30,7 @@ def admin_required(func):
 
 
 @main.route('/')
+@main.route('/index')
 def index():
     return render_template('index.html')
 
@@ -59,6 +60,22 @@ def admin_add_agency():
                 return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_add_agency'))
             flash(u"代理设置失败, {}".format(dbRet))
     return render_template('form.html', form=form, tittle=u"设置代理")
+
+
+@main.route('/admin_modify_agency', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_modify_agency():
+    form = ModifyAgencyForm()
+    if form.validate_on_submit():
+        agencyid = form.agencyid.data
+        dbRet = Mysqlhandler.me().delAgency(agencyid)
+        if dbRet is None:
+            form.agencyid.data = ''
+            msg = u"操作成功, {} 已经不是代理了".format(agencyid)
+            return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_modify_agency'))
+        flash(u"操作失败, {}".format(dbRet))
+    return render_template('form.html', form=form, tittle=u"删除代理")
 
 
 @main.route('/agency_recharge', methods=['GET', 'POST']) 
