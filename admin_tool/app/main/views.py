@@ -102,10 +102,10 @@ def agency_recharge():
         else:
             dbRetIsOk, dbRetData = Mysqlhandler.me().agencyRechargeBySupervior(superviorid, agencyid, money)
         if dbRetIsOk == True:
+            current_user.refreshFromDb()
             form.agencyid.data = ""
             form.money.data = ""
             msg = u'代理充值成功, ID:{}, 充值额:{}, 流水号:{}'.format(agencyid, money, dbRetData)
-            #return render_template('form_ret.html', msg = msg, next_url = url_for('main.agency_recharge')) 
             return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.agency_recharge'))
         
         flash(u"充值失败, {}".format(dbRetData))
@@ -150,10 +150,10 @@ def player_recharge():
             dbRetIsOk, dbRetData = Mysqlhandler.me().playerRechargeByAgency(agencyid, playerid, money)
 
         if dbRetIsOk == True:
+            current_user.refreshFromDb()
             form.playerid.data = ""
             form.money.data = ""
             msg = u'充值成功, 玩家id:{}, 充值额:{}, 流水号:{}'.format(playerid, money, dbRetData)
-            #return render_template('form_ret.html', msg = msg, next_url = url_for('main.player_recharge')) 
             return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.player_recharge'))
         else:
             flash(u"充值失败, {}".format(dbRetData))

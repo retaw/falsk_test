@@ -28,7 +28,7 @@
             </ul>
             {% if current_user.is_authenticated %}
             <ul class="nav navbar-nav navbar-right">
-                <li><a>用户ID: {{ current_user.agencyid }}</a></li>
+                <li><a>用户ID: {{ current_user.agencyid }} 钻石: {{ current_user.money }} </a></li>
             </ul>
             {% endif %}
         </div>

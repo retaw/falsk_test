@@ -93,12 +93,12 @@ class Mysqlhandler:
     def getAgencyBasicInfo(self, agencyid):
         cursor = self.getCursor()
         try:
-            sql = u"select superviorid, passwd from agencies where agencyid = {}".format(agencyid)
+            sql = u"select superviorid, passwd, money from agencies where agencyid = {}".format(agencyid)
             n = cursor.execute(sql)
             if n == 0:
                 return None, None
             row = cursor.fetchone();
-            return (row[0], row[1])
+            return (row[0], row[1], row[2])
         except MySQLdb.Error as e:
             logger.error(e)
             raise
@@ -200,13 +200,18 @@ class Mysqlhandler:
         try:
             if isAdmin is True and superviorid == 0:
                 sqlDeleteAgencyRelation = u"delete from players where playerid={}".format(playerid)
-                cursor.execute(sqlCheckAgencyid)
+                cursor.execute(sqlDeleteAgencyRelation)
                 self.commit(cursor)
                 return True, u"已解除玩家{}的现有代理关系".format(playerid)
 
-            sqlCheckAgencyid = u"select agencyid from agencies where agencyid={}".format(superviorid)
-            if cursor.execute(sqlCheckAgencyid) == 0:
+            sqlCheckSuperviorid = u"select agencyid from agencies where agencyid={}".format(superviorid)
+            if cursor.execute(sqlCheckSuperviorid) == 0:
                 return False, u"代理 {} 不存在".format(superviorid)
+
+
+            sqlCheckPlayerid = u"select agencyid from agencies where agencyid={}".format(playerid)
+            if cursor.execute(sqlCheckPlayerid) > 0:
+                return False, u"{}是代理不是普通玩家".format(playerid)
 
             if isAdmin is not True:
                 sqlCheckPlayerStatus = u"select superviorid from players where playerid={}".format(playerid)
@@ -236,9 +241,10 @@ class Mysqlhandler:
             return False, u"ID={}的玩家不存在".playerid
         cursor = self.getCursor()
         try:
-            sqlCheckRelation = u"select playerid from players where playerid={} and superviorid={}".format(playerid, agencyid)
-            if cursor.execute(sqlCheckRelation) == 0:
-                return False, u"玩家{} 与你之间没有代理关系".format(playerid)
+            if agencyid != playerid: #自己可以充值给自己的游戏账号
+                sqlCheckRelation = u"select playerid from players where playerid={} and superviorid={}".format(playerid, agencyid)
+                if cursor.execute(sqlCheckRelation) == 0:
+                    return False, u"玩家{} 与你之间没有代理关系".format(playerid)
 
             sqlDecMoney = u"update agencies set money=money-{} where agencyid={} and money>={}".format(money, agencyid, money)
             if cursor.execute(sqlDecMoney) == 0:

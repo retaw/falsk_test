@@ -16,21 +16,29 @@ class User(UserMixin):
         print "agenceid = ", agencyid
         password = "123456"
         superviorid = None
+        money = 0
         if agencyid != User.admin_agencyid:
-            superviorid, password = Mysqlhandler.me().getAgencyBasicInfo(agencyid)
+            superviorid, password, money = Mysqlhandler.me().getAgencyBasicInfo(agencyid)
         else:
             print "admin login"
         if password is not None:
-            return User(agencyid, superviorid, password)
+            return User(agencyid, superviorid, password, money)
         return None
 
-    def __init__(self, agencyid, superviorid, password):
+    def __init__(self, agencyid, superviorid, password, money):
         self.agencyid    = agencyid
         self.superviorid = superviorid
         self.password    = password
+        self.money       = money
 
     def get_id(self):
         return str(self.agencyid)
+
+    def refreshFromDb(self):
+        if self.is_admin():
+            return
+        self.superviorid, self.password, self.money = Mysqlhandler.me().getAgencyBasicInfo(self.agencyid)
+        print "refresh from db"
 
     def verify_password(self, password):
         print "verify_passwd {} {}".format(self.agencyid, password)
