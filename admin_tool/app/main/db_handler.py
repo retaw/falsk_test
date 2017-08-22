@@ -377,6 +377,7 @@ class Mysqlhandler:
             sql = u"update agencies set passwd='{}' where agencyid={} and passwd='{}'".format(newpassword, agencyid, password)
             if cursor.execute(sql) == 0:
                 return False, u"原始密码不正确"
+            self.commit(cursor)
             return True, None
         except MySQLdb.Error as e:
             logger.error(e)
