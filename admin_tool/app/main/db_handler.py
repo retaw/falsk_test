@@ -96,7 +96,7 @@ class Mysqlhandler:
             sql = u"select superviorid, passwd, money from agencies where agencyid = {}".format(agencyid)
             n = cursor.execute(sql)
             if n == 0:
-                return None, None
+                return None, None, None
             row = cursor.fetchone();
             return (row[0], row[1], row[2])
         except MySQLdb.Error as e:
