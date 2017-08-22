@@ -374,7 +374,7 @@ class Mysqlhandler:
     def agencyModifyPassword(self, agencyid, password, newpassword):
         cursor = self.getCursor();
         try:
-            sql = u"update agencies set passwd={} where agencyid={} and passwd={}".format(newpassword, agencyid, password)
+            sql = u"update agencies set passwd='{}' where agencyid={} and passwd='{}'".format(newpassword, agencyid, password)
             if cursor.execute(sql) == 0:
                 return False, u"原始密码不正确"
             return True, None
