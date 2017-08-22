@@ -188,7 +188,7 @@ def agency_financial_detail():
 @login_required
 def agency_financial_info():
     superviorid = None if current_user.is_admin() else current_user.agencyid
-    form = QueryAgencyFinancialInfo()
+    form = QueryAgencyFinancialInfoForm()
     if form.validate_on_submit():
         if form.submit1.data is True:
             msg= u"下属累计购买钻石数量"
@@ -201,6 +201,21 @@ def agency_financial_info():
         flash(u"查询失败, {}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"下属钻石情况查询")
 
+@main.route('/agency_modify_password',  methods=['GET', 'POST'])
+@login_required
+def agency_modify_password():
+    superviorid = None if current_user.is_admin() else current_user.agencyid
+    form = ModifyPasswordForm()
+    if form.validate_on_submit():
+        agencyid    = current_user.agencyid
+        password    = form.password.data
+        newpassword = form.newpassword.data
+        dbRetIsOk, dbRetData = Mysqlhandler.me().agencyModifyPassword(agencyid, password, newpassword)
+        if dbRetIsOk == True:
+            msg = "修改密码成功"
+            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.index'))
+        flash(u"修改密码失败, {}".format(dbRetData))
+    return render_template('form.html', form=form, tittle=u"修改密码")
 
 
 @main.route('/player_financial_detail', methods=['GET', 'POST'])

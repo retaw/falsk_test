@@ -54,9 +54,16 @@ class QueryAgencyFinancialForm(FlaskForm):
     pass
 
 
-class QueryAgencyFinancialInfo(FlaskForm):
+class QueryAgencyFinancialInfoForm(FlaskForm):
     submit1 = SubmitField(u"下属购买钻石查询")
     submit2 = SubmitField(u"下属支出钻石查询")
+
+
+class ModifyPasswordForm(FlaskForm):
+    password         = PasswordField(u'当前密码', validators=[Required()])
+    newpassword      = PasswordField(u'新密码', validators=[Required(), EqualTo("newpasswordAgain", message=u"两次输入的密码必须一致")])
+    newpasswordAgain = PasswordField(u'再输一遍新密码', validators=[Required()])
+    submit = SubmitField(u'确定')
 
 
 '''
