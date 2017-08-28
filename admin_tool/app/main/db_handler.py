@@ -238,13 +238,13 @@ class Mysqlhandler:
 
     def playerRechargeByAgency(self, agencyid, playerid, money):
         if Redishandler.me().playerExisit(playerid) is not True:
-            return False, u"ID={}的玩家不存在".playerid
+            return False, u"ID={}的玩家不存在".format(playerid)
         cursor = self.getCursor()
         try:
-            if agencyid != playerid: #自己可以充值给自己的游戏账号
-                sqlCheckRelation = u"select playerid from players where playerid={} and superviorid={}".format(playerid, agencyid)
-                if cursor.execute(sqlCheckRelation) == 0:
-                    return False, u"玩家{} 与你之间没有代理关系".format(playerid)
+            #if agencyid != playerid: #自己可以充值给自己的游戏账号
+            #    sqlCheckRelation = u"select playerid from players where playerid={} and superviorid={}".format(playerid, agencyid)
+            #    if cursor.execute(sqlCheckRelation) == 0:
+            #        return False, u"玩家{} 与你之间没有代理关系".format(playerid)
 
             sqlDecMoney = u"update agencies set money=money-{} where agencyid={} and money>={}".format(money, agencyid, money)
             if cursor.execute(sqlDecMoney) == 0:
@@ -259,7 +259,7 @@ class Mysqlhandler:
 
             if Redishandler.me().playerRecharge(sn, playerid, money, agencyid) is not True:
                 self.rollback(cursor)
-                return False, u"unknown redis error"
+                return False, u"充值失败, 0x11"
 
             logger.info(u"player recharge by agency, sn={}, playerid={}, money={}, agencyid={}".format(sn, playerid, money, agencyid))
             self.commit(cursor)
@@ -276,15 +276,18 @@ class Mysqlhandler:
 
 
     def playerRechargeByAdmin(self, adminid, playerid, money):
+        if not Redishandler.me().playerExisit(playerid):
+            return False, u"ID={}的玩家不存在".format(playerid)
         cursor = self.getCursor()
         try:
+            sqlInsertRecord = u"insert into agency_money (superviorid, playerid, money) values ({}, {}, {})".format(adminid, playerid, money)
+            cursor.execute(sqlInsertRecord)
+
             sqlGetSerialNum = u"select last_insert_id()"
             cursor.execute(sqlGetSerialNum)
             sn = cursor.fetchone()[0]
 
             #add recharge record to redis
-            if not Redishandler.me().playerExisit(playerid):
-                return False, u"充值失败, 玩家id不存在"
             if Redishandler.me().playerRecharge(sn, playerid, money, adminid) is not True:
                 self.rollback(cursor)
                 return False, u"充值失败, 0x12"

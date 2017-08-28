@@ -17,16 +17,16 @@ def initLogger():
     global logger
 
     # fmt = logging.Formatter("%(asctime)s - %(pathname)s - %(filename)s - %(funcName)s - %(lineno)s - %(levelname)s - %(message)s", "%Y-%m-%d %H:%M:%S")  
-    fmt = logging.Formatter("[%(asctime)s] %(levelname)s [%(filename)s,line%(lineno)s,%(funcName)s] %(message)s", "%Y-%m-%d %H:%M:%S")
+    fmt = logging.Formatter("[%(asctime)s] %(levelname)s [%(filename)s,%(lineno)s,%(funcName)s] %(message)s", "%Y-%m-%d %H:%M:%S")
 
-    fileHandler = logging.handlers.TimedRotatingFileHandler("../log/worker", 'H', 1, 0)
+    fileHandler = logging.handlers.TimedRotatingFileHandler("./log/app.log", 'H', 1, 0)
     fileHandler.suffix = "%Y%m%d-%H:%M.log"
     fileHandler.setFormatter(fmt)
     logger.addHandler(fileHandler)
     
-    #cnslHandler = logging.StreamHandler()
-    #cnslHandler.setFormatter(fmt)
-    #logger.addHandler(cnslHandler)
+    cnslHandler = logging.StreamHandler()
+    cnslHandler.setFormatter(fmt)
+    logger.addHandler(cnslHandler)
 
     logger.setLevel(logging.DEBUG)
     logger.debug("logger init")
