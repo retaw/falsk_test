@@ -165,7 +165,7 @@ def player_recharge():
 @login_required
 def agency_financial_detail():
     form = QueryAgencyFinancialForm()
-    wtforms_components.read_only(form.submit2) #TODO, 暂时禁用, 待实现db中的指出查询后去掉这一行
+#    wtforms_components.read_only(form.submit2) #TODO, 暂时禁用, 待实现db中的指出查询后去掉这一行
     if not current_user.is_admin():
         form.agencyid.data = current_user.agencyid
         wtforms_components.read_only(form.agencyid)
@@ -173,13 +173,18 @@ def agency_financial_detail():
     if form.validate_on_submit():
         agencyid = form.agencyid.data if current_user.is_admin() else current_user.agencyid #反外挂
         if form.submit1.data is True:
-            info = u"钻石购买明细, 代理ID: {}".format(agencyid)
+            info = u"购钻明细, 代理ID: {}".format(agencyid)
             dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyIncomeDetail(agencyid)
+            cols = [u"交易流水号", u"钻石数量", u"上级代理ID", u"时间"]
+            records = dbRetData
         else:
-            info = u"钻石支出明细, 代理ID: {}".format(agencyid)
+            info = u"支钻明细, 代理ID: {}".format(agencyid)
             dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyOutcomeDetail(agencyid)
+            cols = [u"交易流水号", u"钻石数量", u"下级代理ID", u"玩家ID", u"时间"]
+            records = dbRetData
+            print "支出明细结果:", records
         if dbRetIsOk == True:
-            return render_template('financial_detail.html', info = info, records = dbRetData, next_url = url_for('main.agency_financial_detail'))
+            return render_template('query_ret.html', info = info, cols = cols, records = records, next_url = url_for('main.agency_financial_detail'))
         flash(u"查询失败{}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"钻石明细查询")
 
@@ -191,13 +196,14 @@ def agency_financial_info():
     form = QueryAgencyFinancialInfoForm()
     if form.validate_on_submit():
         if form.submit1.data is True:
-            msg= u"下属累计购买钻石数量"
+            info= u"下属累计购买钻石数量"
             dbRetIsOk, dbRetData = Mysqlhandler.me().queryAgencyIncomeInfo(superviorid)
         else:
-            msg= u"下属累计支出钻石总量"
+            info= u"下属累计支出钻石总量"
             dbRetIsOk, dbRetData = Mysqlhandler.me().queryAgencyOutcomeInfo(superviorid)
         if dbRetIsOk == True:
-            return render_template('financial_info.html', msg = msg, records = dbRetData, next_url = url_for('main.agency_financial_info'))
+            cols = [u"下级代理ID", u"钻石数量"]
+            return render_template('query_ret.html', info = info, cols = cols, records = dbRetData, next_url = url_for('main.agency_financial_info'))
         flash(u"查询失败, {}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"下属钻石情况查询")
 

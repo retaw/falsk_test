@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}index{% endblock %}
+
+{% block page_content %}
+<div>
+    <h4> {{ info }} </h4>
+    <h4> 共{{ records|length }}条 </h4>
+</div>
+<table border="1">
+    <tr> 
+        <th>____</th>
+        {% for col  in cols %}
+        <th>{{ col }} </th>
+        {% endfor %}
+    </tr>
+    {% for row  in records %}
+    <tr>
+        <td>{{ loop.index }} </td>
+        {% for value in row %}
+        <td>{{ value }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+<div>
+    <h3>{{ msg }}</h3>
+    <h3>  <a href="{{ next_url }}"> 继续</a>  <a href="{{ url_for('main.index') }}"> 返回</a>  </h3>
+</div>
+{% endblock %}
+{% block scripts %}
+{% endblock %}

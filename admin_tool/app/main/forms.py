@@ -49,8 +49,8 @@ class AddPlayerMoneyForm(FlaskForm):
 
 class QueryAgencyFinancialForm(FlaskForm):
     agencyid    = IntegerField(u"代理ID", validators=[Required()])
-    submit1 = SubmitField(u"购买钻石明细")
-    submit2 = SubmitField(u"支付钻石明细")
+    submit1 = SubmitField(u"购钻明细")
+    submit2 = SubmitField(u"支钻明细")
     pass
 
 

@@ -348,7 +348,7 @@ class Mysqlhandler:
     def queryAgencyIncomeDetail(self, agencyid):
         cursor = self.getCursor();
         try:
-            sql = u"select agencyid, money, superviorid, timestamp from agency_money where agencyid={}".format(agencyid)
+            sql = u"select serial_num, money, superviorid, timestamp from agency_money where agencyid={}".format(agencyid)
             n = cursor.execute(sql)
 
             ret = []
@@ -363,7 +363,7 @@ class Mysqlhandler:
     def queryAgencyOutcomeDetail(self, agencyid):
         cursor = self.getCursor();
         try:
-            sql = u"select superviorid, money, agencyid, playerid, timestamp from agency_money where superviorid={}".format(agencyid)
+            sql = u"select serial_num, money, agencyid, playerid, timestamp from agency_money where superviorid={}".format(agencyid)
             n = cursor.execute(sql)
 
             ret = []
