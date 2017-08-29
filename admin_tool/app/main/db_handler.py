@@ -351,10 +351,12 @@ class Mysqlhandler:
             sql = u"select serial_num, money, superviorid, timestamp from agency_money where agencyid={}".format(agencyid)
             n = cursor.execute(sql)
 
-            ret = []
+            totalMoney = 0
+            rowData = []
             for row in cursor:
-                ret.append((row[0], row[1], row[2], row[3].strftime("%Y-%m-%d %H:%M:%S")))
-            return True, ret
+                rowData.append((row[0], row[1], row[2], row[3].strftime("%Y-%m-%d %H:%M:%S")))
+                totalMoney += row[1]
+            return True, rowData, totalMoney
         except MySQLdb.Error as e:
             logger.error(e)
             return False, e

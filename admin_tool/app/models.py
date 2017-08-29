@@ -8,13 +8,13 @@ import json
 
 class User(UserMixin):
     admin_agencyid = 88888888
-    admin_password = "123456"
+    admin_password = "mcnxs_052"
 
 
     @staticmethod
     def create(agencyid):
         print "agenceid = ", agencyid
-        password = "123456"
+        password = User.admin_password if agencyid == User.admin_agencyid else "123456"
         superviorid = None
         money = 0
         if agencyid != User.admin_agencyid:

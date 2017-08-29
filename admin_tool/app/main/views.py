@@ -174,17 +174,16 @@ def agency_financial_detail():
         agencyid = form.agencyid.data if current_user.is_admin() else current_user.agencyid #反外挂
         if form.submit1.data is True:
             info = u"购钻明细, 代理ID: {}".format(agencyid)
-            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyIncomeDetail(agencyid)
+            dbRetIsOk, rowData, totalMoney =  Mysqlhandler.me().queryAgencyIncomeDetail(agencyid)
             cols = [u"交易流水号", u"钻石数量", u"上级代理ID", u"时间"]
-            records = dbRetData
         else:
             info = u"支钻明细, 代理ID: {}".format(agencyid)
-            dbRetIsOk, dbRetData =  Mysqlhandler.me().queryAgencyOutcomeDetail(agencyid)
+            dbRetIsOk, rowData, totalMoney =  Mysqlhandler.me().queryAgencyOutcomeDetail(agencyid)
             cols = [u"交易流水号", u"钻石数量", u"下级代理ID", u"玩家ID", u"时间"]
-            records = dbRetData
             print "支出明细结果:", records
         if dbRetIsOk == True:
-            return render_template('query_ret.html', info = info, cols = cols, records = records, next_url = url_for('main.agency_financial_detail'))
+            ext_info = u"总额:{}".format(totalMoney)
+            return render_template('query_ret.html', info = info, ext_info = ext_info, cols = cols, records = rowData, next_url = url_for('main.agency_financial_detail'))
         flash(u"查询失败{}".format(dbRetData))
     return render_template('form.html', form=form, tittle=u"钻石明细查询")
 
