@@ -180,7 +180,6 @@ def agency_financial_detail():
             info = u"支钻明细, 代理ID: {}".format(agencyid)
             dbRetIsOk, rowData, totalMoney =  Mysqlhandler.me().queryAgencyOutcomeDetail(agencyid)
             cols = [u"交易流水号", u"钻石数量", u"下级代理ID", u"玩家ID", u"时间"]
-            print "支出明细结果:", records
         if dbRetIsOk == True:
             ext_info = u"总额:{}".format(totalMoney)
             return render_template('query_ret.html', info = info, ext_info = ext_info, cols = cols, records = rowData, next_url = url_for('main.agency_financial_detail'))
