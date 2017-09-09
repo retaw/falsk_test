@@ -27,6 +27,15 @@ def admin_required(func):
             return redirect(request.args.get('next') or url_for('main.index'))
     return decorated_admin
 
+def not_viceadmin_required(func):
+    @wraps(func)
+    def decorated_admin(*args, **kwargs):
+        if not current_user.is_viceadmin():
+            return func(*args, **kwargs)
+        else:
+            flash(u'权限不足')
+            return redirect(request.args.get('next') or url_for('main.index'))
+    return decorated_admin
 
 
 @main.route('/')
@@ -37,6 +46,7 @@ def index():
 @main.route('/admin_test')
 @login_required
 @admin_required
+@not_viceadmin_required
 def admin_test():
     return u'暂未开放'
 
@@ -51,6 +61,7 @@ def rander_form_ret():
 @main.route('/admin_add_agency',  methods=['GET', 'POST'])
 @login_required
 @admin_required
+@not_viceadmin_required
 def admin_add_agency():
     form = AddAgencyForm()
     if form.validate_on_submit():
@@ -74,6 +85,7 @@ def admin_add_agency():
 @main.route('/admin_modify_agency', methods=['GET', 'POST'])
 @login_required
 @admin_required
+@not_viceadmin_required
 def admin_modify_agency():
     form = ModifyAgencyForm()
     if form.validate_on_submit():
@@ -90,6 +102,7 @@ def admin_modify_agency():
 
 @main.route('/agency_recharge', methods=['GET', 'POST']) 
 @login_required
+@not_viceadmin_required
 def agency_recharge():
     form = AddAgencyMoneyForm()
     if form.validate_on_submit():
@@ -114,6 +127,7 @@ def agency_recharge():
 
 @main.route('/add_player', methods=['GET', 'POST']) 
 @login_required
+@not_viceadmin_required
 def add_player():
     form = AddPlayerForm()
     if not current_user.is_admin():
@@ -137,6 +151,7 @@ def add_player():
 
 @main.route('/player_recharge', methods=['GET', 'POST']) 
 @login_required
+@not_viceadmin_required
 def player_recharge():
     form = AddPlayerMoneyForm()
     if form.validate_on_submit():
@@ -166,12 +181,12 @@ def player_recharge():
 def agency_financial_detail():
     form = QueryAgencyFinancialForm()
 #    wtforms_components.read_only(form.submit2) #TODO, 暂时禁用, 待实现db中的指出查询后去掉这一行
-    if not current_user.is_admin():
+    if not current_user.is_staff():
         form.agencyid.data = current_user.agencyid
         wtforms_components.read_only(form.agencyid)
 
     if form.validate_on_submit():
-        agencyid = form.agencyid.data if current_user.is_admin() else current_user.agencyid #反外挂
+        agencyid = form.agencyid.data if current_user.is_staff() else current_user.agencyid #反外挂
         if form.submit1.data is True:
             info = u"购钻明细, 代理ID: {}".format(agencyid)
             dbRetIsOk, rowData, totalMoney =  Mysqlhandler.me().queryAgencyIncomeDetail(agencyid)
@@ -190,7 +205,7 @@ def agency_financial_detail():
 @main.route('/agency_financial_info',  methods=['GET', 'POST'])
 @login_required
 def agency_financial_info():
-    superviorid = None if current_user.is_admin() else current_user.agencyid
+    superviorid = None if current_user.is_staff() else current_user.agencyid
     form = QueryAgencyFinancialInfoForm()
     if form.validate_on_submit():
         if form.submit1.data is True:
@@ -207,6 +222,7 @@ def agency_financial_info():
 
 @main.route('/agency_modify_password',  methods=['GET', 'POST'])
 @login_required
+@not_viceadmin_required
 def agency_modify_password():
     superviorid = None if current_user.is_admin() else current_user.agencyid
     form = ModifyPasswordForm()

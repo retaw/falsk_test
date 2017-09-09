@@ -12,18 +12,20 @@
 </div>
 {% else %}
 <ul class="list-group">
-    {% if current_user.is_admin() %}
-    <li class="list-group-item"> <a href="{{ url_for('main.admin_add_agency') }}">代理申请</a></li>
-    <li class="list-group-item"> <a href="{{ url_for('main.admin_modify_agency') }}">删除代理</a></li>
-    <li class="list-group-item"> <a href="{{ url_for('main.admin_test') }}">GM工具</a></li>
-    {% else %}
-    <li class="list-group-item"> <a href="{{ url_for('main.agency_modify_password') }}">修改密码</a></li>
+    {% if not current_user.is_viceadmin() %}
+        {% if current_user.is_admin() %}
+            <li class="list-group-item"> <a href="{{ url_for('main.admin_add_agency') }}">代理申请</a></li>
+            <li class="list-group-item"> <a href="{{ url_for('main.admin_modify_agency') }}">删除代理</a></li>
+            <li class="list-group-item"> <a href="{{ url_for('main.admin_test') }}">GM工具</a></li>
+        {% else %}
+            <li class="list-group-item"> <a href="{{ url_for('main.agency_modify_password') }}">修改密码</a></li>
+        {% endif %}
+        <!--
+        <li class="list-group-item"> <a href="{{ url_for('main.add_player') }}">绑定玩家</a></li>
+        -->
+        <li class="list-group-item"> <a href="{{ url_for('main.agency_recharge') }}">代理金库充值</a></li>
+        <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">游戏玩家充值</a></li>
     {% endif %}
-    <li class="list-group-item"> <a href="{{ url_for('main.agency_recharge') }}">代理金库充值</a></li>
-    <!--
-    <li class="list-group-item"> <a href="{{ url_for('main.add_player') }}">绑定玩家</a></li>
-    -->
-    <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">游戏玩家充值</a></li>
     <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_info') }}">代理查询</a></li>
     <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_detail') }}">交易明细</a></li>
 </ul>
