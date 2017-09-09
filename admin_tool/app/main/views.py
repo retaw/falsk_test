@@ -102,7 +102,7 @@ def admin_del_agency():
             form.agencyid.data = ''
             msg = u"操作成功, {} 已经不是代理了".format(agencyid)
             #return render_template('form_ret.html', msg = msg, next_url = url_for('main.admin_modify_agency'))
-            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_modify_agency'))
+            return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_del_agency'))
         flash(u"操作失败, {}".format(dbRet))
     return render_template('form.html', form=form, tittle=u"删除代理")
 
