@@ -45,6 +45,9 @@ class User(UserMixin):
     def get_id(self):
         return str(self.agencyid)
 
+    def adminid(self):
+        return User.admin_agencyid
+
     def refreshFromDb(self):
         if self.is_admin():
             return

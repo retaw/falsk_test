@@ -27,6 +27,16 @@ def admin_required(func):
             return redirect(request.args.get('next') or url_for('main.index'))
     return decorated_admin
 
+def staff_required(func):
+    @wraps(func)
+    def decorated_admin(*args, **kwargs):
+        if current_user.is_staff():
+            return func(*args, **kwargs)
+        else:
+            flash(u'权限不足')
+            return redirect(request.args.get('next') or url_for('main.index'))
+    return decorated_admin
+
 def not_viceadmin_required(func):
     @wraps(func)
     def decorated_admin(*args, **kwargs):
@@ -45,8 +55,7 @@ def index():
 
 @main.route('/admin_test')
 @login_required
-@admin_required
-@not_viceadmin_required
+@staff_required
 def admin_test():
     return u'暂未开放'
 
@@ -60,8 +69,7 @@ def rander_form_ret():
 
 @main.route('/admin_add_agency',  methods=['GET', 'POST'])
 @login_required
-@admin_required
-@not_viceadmin_required
+@staff_required
 def admin_add_agency():
     form = AddAgencyForm()
     if form.validate_on_submit():
@@ -71,7 +79,7 @@ def admin_add_agency():
         if agencyid == superviorid:
             flash(u"代理的上级不能是自己")
         else:
-            dbRet = Mysqlhandler.me().addAgency(agencyid, password, superviorid, current_user.agencyid == superviorid)
+            dbRet = Mysqlhandler.me().addAgency(agencyid, password, superviorid, current_user.adminid() == superviorid)
             if dbRet is None:
                 form.agencyid.data = None
                 form.superviorid.data = current_user.agencyid
@@ -82,11 +90,10 @@ def admin_add_agency():
     return render_template('form.html', form=form, tittle=u"设置代理")
 
 
-@main.route('/admin_modify_agency', methods=['GET', 'POST'])
+@main.route('/admin_del_agency', methods=['GET', 'POST'])
 @login_required
-@admin_required
-@not_viceadmin_required
-def admin_modify_agency():
+@staff_required
+def admin_del_agency():
     form = ModifyAgencyForm()
     if form.validate_on_submit():
         agencyid = form.agencyid.data
@@ -127,16 +134,16 @@ def agency_recharge():
 
 @main.route('/add_player', methods=['GET', 'POST']) 
 @login_required
-@not_viceadmin_required
+@staff_required #禁止代理自己加玩家了
 def add_player():
     form = AddPlayerForm()
-    if not current_user.is_admin():
+    if not current_user.is_staff():
         form.superviorid.data = current_user.agencyid
         wtforms_components.read_only(form.superviorid)
     if form.validate_on_submit():
         playerid    = form.playerid.data
-        superviorid = form.superviorid.data if current_user.is_admin() else current_user.agencyid #反外挂
-        dbRetIsOk, dbRetData = Mysqlhandler.me().addPlayer(superviorid, playerid, current_user.is_admin())
+        superviorid = form.superviorid.data if current_user.is_staff() else current_user.agencyid #反外挂
+        dbRetIsOk, dbRetData = Mysqlhandler.me().addPlayer(superviorid, playerid, current_user.is_staff())
 
         if dbRetIsOk == True:
             form.playerid.data    = ""
@@ -222,9 +229,8 @@ def agency_financial_info():
 
 @main.route('/agency_modify_password',  methods=['GET', 'POST'])
 @login_required
-@not_viceadmin_required
 def agency_modify_password():
-    superviorid = None if current_user.is_admin() else current_user.agencyid
+    superviorid = None if current_user.is_staff() else current_user.agencyid
     form = ModifyPasswordForm()
     if form.validate_on_submit():
         agencyid    = current_user.agencyid
