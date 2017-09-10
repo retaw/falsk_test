@@ -24,11 +24,13 @@
     -->
     {% if not current_user.is_viceadmin() %}
         <li class="list-group-item"> <a href="{{ url_for('main.agency_recharge') }}">代理金库充值</a></li>
-        <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">游戏玩家充值</a></li>
     {% endif %}
 
         <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_info') }}">代理查询</a></li>
         <li class="list-group-item"> <a href="{{ url_for('main.agency_financial_detail') }}">交易明细</a></li>
+    {% if not current_user.is_viceadmin() %}
+        <li class="list-group-item"> <a href="{{ url_for('main.player_recharge') }}">游戏玩家充值</a></li>
+    {% endif %}
 </ul>
 {% endif %}
 {% endblock %}
