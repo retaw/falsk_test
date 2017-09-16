@@ -66,6 +66,11 @@ class ModifyPasswordForm(FlaskForm):
     submit = SubmitField(u'确定')
 
 
+class GmForm(FlaskForm):
+    submit1 = SubmitField(u"重载配置文件")
+    pass
+
+
 '''
 class QueryPlayerFinancialByAdminForm(FlaskForm):
     playerid    = IntegerField(u"玩家ID", validators=[Required()])

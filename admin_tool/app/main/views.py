@@ -14,8 +14,10 @@ from flask_login import login_required, current_user
 from . import main
 from functools import wraps
 from db_handler import Mysqlhandler
+from redis_handler import Redishandler
 from .forms import *
 import wtforms_components
+
 
 def admin_required(func):
     @wraps(func)
@@ -53,11 +55,6 @@ def not_viceadmin_required(func):
 def index():
     return render_template('index.html')
 
-@main.route('/admin_test')
-@login_required
-@staff_required
-def admin_test():
-    return u'暂未开放'
 
 #所有变动性操作, 成功后跳转到这里来显示结果, 避免f5刷新造成的重复修改
 @main.route('/rander_form_ret')
@@ -65,6 +62,21 @@ def rander_form_ret():
     msg = request.args.get('msg')
     op  = request.args.get('op')
     return render_template('form_ret.html', msg = msg, next_url = url_for(op))
+
+
+@main.route('/admin_gm', methods=['GET', 'POST'])
+@login_required
+@staff_required
+def admin_gm():
+    form = GmForm()
+    if form.validate_on_submit():
+        if form.submit1.data is True:
+            ret = Redishandler.me().loadGameCfg()
+            msg = u"加载配置命令发送{}".format(u"成功" if ret else u"失败")
+        else:
+            pass
+        return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_gm'))
+    return render_template('form.html', form=form, tittle=u"GM工具")
 
 
 @main.route('/admin_add_agency',  methods=['GET', 'POST'])
