@@ -4,13 +4,18 @@
 {% block title %}Admin-login{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h2>{{ tittle }}</h1>
-</div>
-
-<div class="col-md-4">
-     {{ wtf.quick_form(form) }}
-</div>
+    <div class="page-header">
+        <h2>{{ tittle }}</h1>
+    </div>
+    
+    <div class=news>
+    {% for form in forms %}
+        <div class="col-md-4 news">
+            <hr />
+            {{ wtf.quick_form(form) }}
+        </div>
+    {% endfor %}
+    </div>
 {% endblock %}
 
 {% block scripts %}

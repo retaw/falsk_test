@@ -66,8 +66,20 @@ class ModifyPasswordForm(FlaskForm):
     submit = SubmitField(u'确定')
 
 
-class GmForm(FlaskForm):
+class GmReloadCfg(FlaskForm):
     submit1 = SubmitField(u"重载配置文件")
+    pass
+
+
+class GmDismissRoom(FlaskForm):
+    roomid    = IntegerField(u"房间号", validators=[Required()])
+    ownerCuid = IntegerField(u"房主ID", validators=[Required()])
+    submit = SubmitField(u"解散房间")
+    pass
+
+
+class TestForm(FlaskForm):
+    date1   = DateField(u'date', widget=DatePickerWidget())
     pass
 
 

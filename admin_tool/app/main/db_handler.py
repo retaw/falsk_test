@@ -10,6 +10,7 @@
 
 import sys 
 import MySQLdb
+import config
 from redis_handler import Redishandler
 #import IniParser
 
@@ -36,20 +37,11 @@ class Mysqlhandler:
 #        sys.setdefaultencoding('utf-8') 
 
         try:
-            #cfgPath = "../config/db_mysql.cfg"
-            #config = IniParser.IniFile(cfgPath)
-    
-            #host = config.get("db", "host")
-            #port = config.get("db", "port")
-            #db = config.get("db", "dbname")
-            #user = config.get("authorized", "username")
-            #pwd = config.get("authorized", "password")
-
-            host = "127.0.0.1"
-            port = "3306"
-            db   = "game"
-            user = "water"
-            pwd  = "111111"
+            host = config.mysql["host"]
+            port = config.mysql["port"]
+            db   = config.mysql["db"]
+            user = config.mysql["user"]
+            pwd  = config.mysql["pwd"]
 
             print "dbinfo:",host,port,db,user,pwd
     

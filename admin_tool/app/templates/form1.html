@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Admin-login{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h2>{{ tittle }}</h1>
+</div>
+
+<div class="col-md-4">
+    <form method="post" class="form" role="form">
+	{% for field in form %}
+		 <label for="{{ field.id }}" class="control-label">{{ field.label }}</label>
+	{% endfor %}
+          <input id="csrf_token" name="csrf_token" type="hidden" value="ImE2NzdkZDhlOWQ2NjkxODFmODI4YTAxNmFiZDk4NjVkMmRiNDJlN2Yi.DKmizw.JCFad_afi364H-3yo1B-kX9oVuc">
+          <div class="form-group ">
+              <label class="control-label" for="date1">date</label>
+              {{ form.date1(class="dtpick form-control") }}
+          </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script> $(function() { $( ".dtpick" ).datepicker();}); </script>
+{% endblock %}

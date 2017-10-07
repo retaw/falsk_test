@@ -50,6 +50,12 @@ def not_viceadmin_required(func):
     return decorated_admin
 
 
+@main.route('/test')
+def test():
+    form = TestForm()
+    return render_template('form1.html', form=form, tittle=u'test')
+
+
 @main.route('/')
 @main.route('/index')
 def index():
@@ -68,15 +74,31 @@ def rander_form_ret():
 @login_required
 @staff_required
 def admin_gm():
-    form = GmForm()
-    if form.validate_on_submit():
-        if form.submit1.data is True:
+    form1 = GmReloadCfg()
+    form2 = GmDismissRoom()
+
+    submit = False
+    if form1.validate_on_submit():
+        if form1.submit1.data is True:
             ret = Redishandler.me().loadGameCfg()
             msg = u"加载配置命令发送{}".format(u"成功" if ret else u"失败")
+            submit = True
         else:
             pass
+
+    if form2.validate_on_submit():
+        if form2.submit.data is True:
+            roomid    = form2.roomid.data
+            ownerCuid = form2.ownerCuid.data
+            ret = Redishandler.me().dismissRoom(roomid, ownerCuid)
+            msg = u"解散房间命令发送{}, 房间号={}, 房主ID={}".format(u"成功" if ret else u"失败", roomid, ownerCuid)
+            submit = True
+        #return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_gm'))
+
+    if submit:
         return redirect(url_for('main.rander_form_ret', msg = msg, op = 'main.admin_gm'))
-    return render_template('form.html', form=form, tittle=u"GM工具")
+    forms = [form1, form2]
+    return render_template('forms.html', forms=forms, tittle=u"GM工具")
 
 
 @main.route('/admin_add_agency',  methods=['GET', 'POST'])

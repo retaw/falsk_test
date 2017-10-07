@@ -29,7 +29,7 @@ def initLogger():
     logger.addHandler(cnslHandler)
 
     logger.setLevel(logging.DEBUG)
-    logger.debug("logger init")
+#    logger.debug("logger init")
 
 
 
